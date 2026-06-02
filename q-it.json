@@ -1,0 +1,891 @@
+{
+  "name": "q-it",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Config System Prompt').item.json['user-input'] }}",
+        "options": {
+          "systemMessage": "={{ $json.SystemMessage }}\n\n\n"
+        }
+      },
+      "id": "cf589ce9-c162-4374-bfa9-e26462222e88",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1312,
+        -1008
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "maxTries": 5,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-flash-latest",
+        "options": {
+          "safetySettings": {
+            "values": [
+              {
+                "category": "HARM_CATEGORY_HARASSMENT",
+                "threshold": "BLOCK_NONE"
+              },
+              {
+                "category": "HARM_CATEGORY_HATE_SPEECH",
+                "threshold": "BLOCK_NONE"
+              },
+              {
+                "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                "threshold": "BLOCK_NONE"
+              },
+              {
+                "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                "threshold": "BLOCK_NONE"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        992,
+        -784
+      ],
+      "id": "5539b656-df6d-4a4c-8c39-6d260019bf50",
+      "name": "Google Gemini Chat Model",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "maxTries": 5,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "1TfOpAm5kyhUba0H",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this to create a new event in Google Calendar ONLY AFTER you have confirmed that the time slot is available. The event description should contain any other additional details , if no additional details then it can be empty",
+        "calendar": {
+          "__rl": true,
+          "value": "e28362be354fc44462596d739f4a5431a949ed49cd2fc28fa4194317f4b709b1@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "FrontDesk24"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "color": "={{ $fromAI(\"Event_Color\", \"The color ID for the event. Return '11' (Red) ONLY if the case is URGENT or the patient is in PAIN. Otherwise return '7' (Peacock/Default).\", \"string\", \"\") }}",
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}",
+          "summary": "={{ $('Filter').item.json.ProfileName }} {{ $('Filter').item.json.WaId }}"
+        }
+      },
+      "id": "83d971fa-8453-4be6-8dbd-7f3e8e7d53dd",
+      "name": "Create",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.2,
+      "position": [
+        1248,
+        -784
+      ],
+      "notesInFlow": false,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "sUNQLkYCjdE8tAxu",
+          "name": "Google Calendar account"
+        }
+      },
+      "notes": "Use this to create a new event in Google Calendar. It accepts a title (also called summary)"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "e28362be354fc44462596d739f4a5431a949ed49cd2fc28fa4194317f4b709b1@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "FrontDesk24"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "options": {}
+      },
+      "id": "62805da1-fa53-400e-bd34-5f7ad0c8ccf4",
+      "name": "Delete",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.2,
+      "position": [
+        1376,
+        -784
+      ],
+      "notesInFlow": false,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "sUNQLkYCjdE8tAxu",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d07d2b16-cf22-49c5-9a87-8d96b4d5e270",
+              "leftValue": "={{ $json.Body }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "9865f12c-3d04-46a8-87ad-5591113a2a8d",
+              "leftValue": "={{ $json.NumMedia.toNumber()}}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -576,
+        -1008
+      ],
+      "id": "40f05bcd-f2d4-4767-a369-76533096506a",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this to get all events from the calendar to check for available time slots for a given day.",
+        "resource": "calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "e28362be354fc44462596d739f4a5431a949ed49cd2fc28fa4194317f4b709b1@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "FrontDesk24"
+        },
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start_Time', ``, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End_Time', ``, 'string') }}",
+        "options": {}
+      },
+      "id": "65878211-0c9d-4b6d-8461-16d5d94fcdf4",
+      "name": "Get Availability",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.2,
+      "position": [
+        1504,
+        -784
+      ],
+      "notesInFlow": false,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "sUNQLkYCjdE8tAxu",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "from": "={{ $('Filter').item.json.To.replace(\"whatsapp:\", \"\")  }}",
+        "to": "={{ $('Filter').item.json.From.replace(\"whatsapp:\", \"\")  }}",
+        "toWhatsapp": true,
+        "message": "={{ $('AI Agent').item.json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1968,
+        -912
+      ],
+      "id": "7d8d1739-7a65-4915-a3e6-65ff6e8baa9a",
+      "name": "Send an SMS/MMS/WhatsApp message",
+      "credentials": {
+        "twilioApi": {
+          "id": "52KiSmqe2FTesw8N",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "com.twilio.messaging.inbound-message.received"
+        ]
+      },
+      "type": "n8n-nodes-base.twilioTrigger",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        -1008
+      ],
+      "id": "a4a7f53c-6944-44d4-9f0f-d858ee3c135d",
+      "name": "Twilio Trigger",
+      "webhookId": "d191f97e-9b62-4ffb-b8b1-c52ff68c91cc",
+      "credentials": {
+        "twilioApi": {
+          "id": "52KiSmqe2FTesw8N",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "MdjLWZG4d8Eo6xWB",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/MdjLWZG4d8Eo6xWB",
+          "cachedResultName": "Log Catcher"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "workflow-execution-id": "={{ $execution.id }}"
+          },
+          "matchingColumns": [
+            "workflow-execution-id"
+          ],
+          "schema": [
+            {
+              "id": "workflow-execution-id",
+              "displayName": "workflow-execution-id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2192,
+        -912
+      ],
+      "id": "d082025e-9908-4a9b-b02c-ccd531c09d2e",
+      "name": "Call 'Log Catcher'",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "e28362be354fc44462596d739f4a5431a949ed49cd2fc28fa4194317f4b709b1@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "FrontDesk24"
+        },
+        "timeMax": "={{ $now.plus({ week: 6 }) }}",
+        "options": {
+          "query": "={{ $('Filter').item.json.ProfileName }} {{ $('Filter').item.json.WaId }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1632,
+        -784
+      ],
+      "id": "fd16a74b-7e4c-45ad-8b49-6b8e39f44aad",
+      "name": "Find Events",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "sUNQLkYCjdE8tAxu",
+          "name": "Google Calendar account"
+        }
+      },
+      "notes": "{{ $now.plus({ week: 1 }) }}"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c143aca0-3654-4841-9670-94bc7650a9ae",
+              "name": "SystemMessage",
+              "value": "=### Role & General Rules\nYou are an assistant for reserving a spot (תור) in a queue. **LANGUAGE RULE:** You MUST reply in the **same language** the user is currently using.\n1. If the user writes in **Hebrew**, reply in **Hebrew**.\n2. If the user writes in **Russian**, reply in **Russian**.\n3. If the user writes in **English**, reply in **English**.\n4. If the input is short or ambiguous (like \"ok\" or \"10:00\"), reply in the language used in the previous turn.\n\n### USER CONTEXT (READ-ONLY):\n\n- Current Intent: {{ $('Get user state').item.json.current_intent || 'None' }}\n- Booking Status: {{ $('Get user state').item.json.booking_status || 'New User' }}\n- Urgent: {{ $('Get user state').item.json.is_urgent || 'false' }}\n- Urgency Type: {{ $('Get user state').item.json.urgency_type || 'None' }}\n\n### Transparency & Logic Protocol (CRITICAL)\n1. **Explain the \"Why\":** If the user's direct request cannot be fulfilled (e.g., slot busy, invalid ID, error) and you decide to perform an alternative action to be helpful (like checking a different time or date), you MUST explicitly explain this pivot.\n2. **No Silent Failures:** Never present the result of a *secondary* check without first mentioning the failure of the *primary* request.\n   - *Bad:* \"16:30 is available.\" (Hides the fact that 16:00 was busy).\n   - *Good:* \"16:00 is currently unavailable, but I checked 16:30 and it is free.\"\n3. **Mirror the User's Constraints:** If the user asked for \"Doctor Cohen\" and you switch to \"Any Doctor\", state clearly: \"Doctor Cohen is fully booked, so I looked for available slots with other doctors...\"\n\n\n### Role & General Rules...\n\n1. **Duration:** Every queue (event) you set is for 30 minutes. Do not ask for duration.\n2. **Role:** Your job is \"Reserving a spot in the queue.\" Act accordingly.\n3. **Context:** The calendar belongs to the service provider, not the user.\n4. **Current Time:** The current date and time is {{ $now.format('cccc, yyyy-MM-dd HH:mm') }}. Use this to calculate relative dates like \"tomorrow\" or \"next Tuesday.\"\n5. **Current Time & Date Context:**\n   - **NOW (Today):** {{ $now.format('cccc, yyyy-MM-dd HH:mm') }}\n   - **TOMORROW Is:** {{ $now.plus({days: 1}).format('cccc, yyyy-MM-dd') }}\n   - **DAY AFTER TOMORROW Is:** {{ $now.plus({days: 2}).format('cccc, yyyy-MM-dd') }}\n\n   **Strict Date Naming Rule:**\n   - Compare the event date to the definitions above.\n   - If the event date matches \"TOMORROW\", you may say \"tomorrow\" ({{ $now.plus({days: 1}).format('cccc') }}).\n   - If the event date matches \"DAY AFTER TOMORROW\", you MUST call it \"{{ $now.plus({days: 2}).format('cccc') }}\" (e.g., \"Wednesday\"). Do NOT call it \"tomorrow\".\n\n### Critical Rules for Tools\n1. **Trust Tools Over Memory:** If a tool (like 'Find Events' or 'Create') returns new data, TRUST IT completely. Ignore contradictory information from previous chat messages.\n2. **IDs are Technical:** An Event ID is ALWAYS a long alphanumeric string (e.g., \"ag7gcncu1a5nst73e\"). It is NEVER a date or time. You must extract this ID from the 'Find Events' tool output.\n\n###Scheduling a New Spot\nWhen a user asks to schedule a spot (e.g., \"לקבוע תור\" or \"מתי זה אפשרי\"):\n\n1.  First, you MUST use the 'Get Availability' tool to check if the user's requested time slot is free. This tool needs a 'startDateTime' and 'endDateTime'.\n2.  If the tool returns `true` (available), tell the user the slot is available and ask for confirmation to book.\n3.  If the tool returns `false` (busy), tell the user the slot is busy and suggest another time.\n4.  You can ONLY use the 'Create' tool *after* the 'Get Availability' tool has returned `true` for that exact slot AND you have the user's confirmation.\n\n### Urgent Case Management (The \"Human Touch\")\n**CRITICAL EXCEPTION RULE:**\nIf the user requests a time slot that the 'Get Availability' tool reports as **BUSY (`false`)**, BUT the user indicates they are **in pain, distress, or it is urgent , or it is an emergency**:\n\n1.  **DO NOT** simply refuse the booking.\n2.  **Logic:** You act as a caring secretary. You cannot promise the slot, but you can add a \"Pending Request\" for the doctor to review.\n3.  **Response:** Acknowledge their pain with empathy. Tell them the slot is technically full, but due to their situation, you can place a \"Special Request\" that the doctor might approve. Ask if they want to proceed with this request.\n4.  **Action:** If they say YES:\n    4.1* Call the 'Create' tool for that *busy* time slot.\n    4.1.1* You MUST set the  `Event_Color` parameter to '11' \n    4.1.2* **IMPORTANT:** In the `description` field, write: \"Urgent overbooking request. Waiting for doctor approval. Urgency type:\"  \n\t **Apply** one  of the following categories:\n   - \"PAIN\": User mentions physical pain, discomfort, or medical distress.\n   - \"TIME_SENSITIVE\": User has a deadline (e.g., \"traveling tomorrow\", \"wedding next week\").\n   - \"GENERAL\": User just says \"it's urgent\" without specific reason.\n\n    4.2 * **Final Reply:** \"I have placed a high-priority request for [Time] on your behalf. The doctor will review it and we will notify you if it is approved.\"\n---\n### Canceling an Existing Event\n\nWhen a user asks to cancel an event (e.g., \"לבטל תור\"):\n\n1.  use the 'Find Events' tool. \n2.  look at the list of events returned by 'Find Events' and find the event the user wants to cancel. \n\n3.  STOP and confirm the event details (like its summary and time) with the user.\nWhen the user confirms they want to delete:\n3.1  You MUST run the 'Find Events' tool AGAIN to get the specific event object.\n3.2. DO NOT rely on IDs from previous messages or memory.\n3.3  Use the 'id' from the NEW 'Find Events' output to run the 'Delete' tool immediately after.\n4.  Finally, after the user has confirmed it's the correct event, use the 'Delete' tool. You MUST provide the 'id' (which you get from the output of the 'Find Events' tool) to the 'Delete' tool. This id is to be mapped to Event ID of the 'Delete' tool\n\n\n---\n### Updating an Existing Event\n\nWhen a user asks to update an event (e.g., \"להזיז תור\"):\n\n1.  use the 'Find Events' tool. \n2.  look at the list of events returned by 'Find Events' and find the event the user wants to cancel. \n\n3.  STOP and confirm the event details (like its summary and time) with the user.\nWhen the user confirms they want to delete:\n3.1  You MUST run the 'Find Events' tool AGAIN to get the specific event object.\n3.2. DO NOT rely on IDs from previous messages or memory.\n3.3  Use the 'id' from the NEW 'Find Events' output to run the 'Delete' tool immediately after.\n4.  Finally, after the user has confirmed it's the correct event, use the 'Update' tool. You MUST provide the 'id' (which you get from the output of the 'Find Events' tool) to the 'Delete' tool. This id is to be mapped to Event ID of the 'Update' tool\n\n---\n\n### Current Time Context:\n   - NOW: {{ $now.format('cccc, yyyy-MM-dd HH:mm') }}\n   - TOMORROW is: {{ $now.plus({days: 1}).format('cccc, yyyy-MM-dd') }}\n   - DAY AFTER TOMORROW is: {{ $now.plus({days: 2}).format('cccc, yyyy-MM-dd') }}\n\n   *Rule:* precise terminology for dates. If the event is on {{ $now.plus({days: 2}).format('yyyy-MM-dd') }}, do NOT call it \"tomorrow\". Call it \"Wednesday\" or \"In two days\".\n\n### Handling Confirmations & Small Talk\nIf the user replies with \"ok\", \"thanks\", \"great\", or confirms a finished action:\n1.  Simply reply politely (e.g., \"You are welcome\", \"See you then\", \"Glad I could help\").\n2.  **DO NOT** offer to cancel, update, or delete the appointment.\n3.  **DO NOT** ask follow-up questions unless necessary.\n\n**IMPORTANT: Filling the 'description' field in 'Create' tool:**\n- **Capture Details:** If the user mentions ANY extra details (e.g., \"I prefer Dr. Cohen\", \"I will bring Form 17\", \"It's for back pain\"), you MUST put this text into the `description` parameter.\n- **Keep it Clean:** If the user provided ONLY the date and time, leave the `description` parameter EMPTY. Do not invent details.",
+              "type": "string"
+            },
+            {
+              "id": "98d9d454-bd78-4f7d-bcd9-22ce94f309eb",
+              "name": "user-input",
+              "value": "={{ $json['user-input'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        768,
+        -1008
+      ],
+      "id": "2b4c84b2-b7d7-4841-a860-4dbdf7c351db",
+      "name": "Config System Prompt",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "e28362be354fc44462596d739f4a5431a949ed49cd2fc28fa4194317f4b709b1@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "FrontDesk24"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "updateFields": {
+          "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+          "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1760,
+        -784
+      ],
+      "id": "880deef5-b2a8-4f49-86dd-42ca68036261",
+      "name": "Update",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "sUNQLkYCjdE8tAxu",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2ef3aa41-8cf2-4fa7-926f-7fc4c6e28d9e",
+              "leftValue": "={{ $('Twilio Trigger').item.json.NumMedia.toNumber() }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        -1008
+      ],
+      "id": "d13975f0-88bb-4508-ac19-a1de59786178",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        320,
+        -1104
+      ],
+      "id": "119ee5c5-4278-4022-8259-7e3aaf4adac7",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "1TfOpAm5kyhUba0H",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ef3d32e1-1856-4067-b813-462301eee378",
+              "name": "user-input",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        544,
+        -1104
+      ],
+      "id": "bdf20e7a-dda1-4470-97ab-9a954200d0b0",
+      "name": "Normalize Voice"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ef3d32e1-1856-4067-b813-462301eee378",
+              "name": "user-input",
+              "value": "={{ $('Twilio Trigger').item.json.Body }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        544,
+        -912
+      ],
+      "id": "8b8009a5-3592-44a8-b574-c72ac7f8a40d",
+      "name": "Normalize Text"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.MediaUrl0 }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        96,
+        -1104
+      ],
+      "id": "af785c27-5008-4e5c-97d8-e9e04ec391af",
+      "name": "Get voice message from Twilio",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "Klk69nLN01Bgm245",
+          "name": "Twilio Basic Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Twilio Trigger').item.json.From }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        1120,
+        -784
+      ],
+      "id": "eae1d8cd-8ba5-4378-81d8-192a2f160c87",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "Lebg7w2iiLImjvhH",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "X7HxFr8PwbUoOr41",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/X7HxFr8PwbUoOr41",
+          "cachedResultName": "update user-state"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "output": "={{ $json.output }}",
+            "user-input": "={{ $('Config System Prompt').item.json['user-input'] }}",
+            "from": "={{ $('Twilio Trigger').item.json.From }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "user-input",
+              "displayName": "user-input",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "output",
+              "displayName": "output",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "from",
+              "displayName": "from",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1968,
+        -1104
+      ],
+      "id": "828c10a5-0055-4a86-824b-46cbddde882e",
+      "name": "Call 'update user-state'"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT current_intent, booking_status \nFROM user_state \nWHERE session_id = '{{ $('Twilio Trigger').item.json.From }}' \nLIMIT 1;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -352,
+        -1008
+      ],
+      "id": "480b4a30-7706-45fc-b099-629c06f0bb5b",
+      "name": "Get user state",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "Lebg7w2iiLImjvhH",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Twilio Trigger": [
+      {
+        "json": {
+          "ExternalUserId": "whatsapp:IL.4475555156091037",
+          "SmsMessageSid": "SM870763fdc39a0ea4b2b01307a957fe7d",
+          "NumMedia": "0",
+          "ProfileName": "Ilia Kaplan",
+          "MessageType": "text",
+          "SmsSid": "SM870763fdc39a0ea4b2b01307a957fe7d",
+          "WaId": "972545422977",
+          "SmsStatus": "received",
+          "Body": "schedule an appointment tomorrow morning",
+          "To": "whatsapp:+14155238886",
+          "NumSegments": "1",
+          "ReferralNumMedia": "0",
+          "MessageSid": "SM870763fdc39a0ea4b2b01307a957fe7d",
+          "AccountSid": "AC036959f61ed7fcb3209b8325c31e69ca",
+          "ChannelMetadata": "{\"type\":\"whatsapp\",\"data\":{\"context\":{\"ProfileName\":\"Ilia Kaplan\",\"WaId\":\"972545422977\"}}}",
+          "From": "whatsapp:+972545422977",
+          "ApiVersion": "2010-04-01"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ],
+      "main": [
+        []
+      ]
+    },
+    "Create": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Call 'update user-state'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Get user state",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Availability": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twilio Trigger": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an SMS/MMS/WhatsApp message": {
+      "main": [
+        [
+          {
+            "node": "Call 'Log Catcher'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Log Catcher'": {
+      "main": [
+        []
+      ]
+    },
+    "Find Events": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config System Prompt": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get voice message from Twilio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Normalize Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Normalize Voice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Text": {
+      "main": [
+        [
+          {
+            "node": "Config System Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Voice": {
+      "main": [
+        [
+          {
+            "node": "Config System Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get voice message from Twilio": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get user state": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Jerusalem",
+    "callerPolicy": "workflowsFromSameOwner",
+    "saveExecutionProgress": true,
+    "errorWorkflow": "2PdlcN71aQhkDSvs"
+  },
+  "versionId": "fc44b9bd-c3f3-42f7-9418-047b60d474c3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "27321d52f7e04b14dba7ed50e5a19648883711f78c70287ea0246e4a3dd166a6"
+  },
+  "id": "arpw995JGISXjmnu",
+  "tags": []
+}
